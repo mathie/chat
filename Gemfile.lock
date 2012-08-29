@@ -28,6 +28,14 @@ GEM
     activesupport (3.2.8)
       i18n (~> 0.6)
       multi_json (~> 1.0)
+    amq-client (0.9.4)
+      amq-protocol (>= 0.9.4)
+      eventmachine
+    amq-protocol (0.9.4)
+    amqp (0.9.7)
+      amq-client (~> 0.9.4)
+      amq-protocol (>= 0.9.4)
+      eventmachine
     arel (3.0.2)
     builder (3.0.0)
     coffee-rails (3.2.2)
@@ -130,6 +138,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  amqp
   coffee-rails (~> 3.2.1)
   eventmachine (~> 1.0.0.rc.4)
   foreman
