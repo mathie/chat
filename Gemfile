@@ -5,6 +5,7 @@ gem 'rails', '3.2.8'
 # Force thin to use a more recent version of EventMachine
 gem 'eventmachine', '~> 1.0.0.rc.4'
 gem 'thin'
+gem 'sinatra'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
