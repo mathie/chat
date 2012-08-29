@@ -1,14 +1,51 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Chat</title>
-  <%= stylesheet_link_tag    "application", :media => "all" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= yield(:title) %> - Chat</title>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag "application", :media => "all" %>
+    <%= javascript_include_tag "application" %>
+  </head>
+  <body>
 
-<%= yield %>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Chat</a>
+        </div>
+      </div>
+    </div>
 
-</body>
+    <div class="container">
+      <div class="content">
+        <div class="row">
+           <div class="span9">
+             <hgroup class="page-header">
+               <h1><%= yield :title %></h1>
+             </hgroup>
+
+              <%= yield %>
+            </div>
+            <div class="span3">
+              <div class="well sidebar-nav">
+                <h3>Sidebar</h3>
+                <ul class="nav nav-list">
+                  <li class="nav-header">Sidebar</li>
+                  <li><%= link_to "Link1", "/path1"  %></li>
+                  <li><%= link_to "Link2", "/path2"  %></li>
+                  <li><%= link_to "Link3", "/path3"  %></li>
+                </ul>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>&copy; Rubaidh Ltd 2012</p>
+      </footer>
+    </div>
+  </body>
 </html>
