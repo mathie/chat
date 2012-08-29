@@ -6,7 +6,6 @@ class ChatStream < Sinatra::Base
   end
 
   get '/stream' do
-    logger.info "logger is #{logger.inspect}"
     stream do |out|
       100.times do |i|
         out << "Got #{i}\n"
