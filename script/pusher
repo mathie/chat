@@ -10,10 +10,9 @@ EventMachine.run do
 
   EventMachine.add_periodic_timer(1.0) do
     payload = {
-      generation_timestamp: Time.now.utc
+      generation_timestamp: Time.now.utc,
+      milliseconds: Time.now.utc.to_f * 1000.0
     }
-
-    puts "Publishing a payload."
     exchange.publish(payload.to_json, type: 'message')
   end
 end

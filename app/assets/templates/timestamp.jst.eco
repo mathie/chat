@@ -1,1 +1,4 @@
-<span class="current-time"><%= @serverTime %></span>
+<span class="current-time"><%= @model.get('serverTime') %></span>
+(C &rarr; S: <%= @model.get('clientToSinatraLatency').toFixed(2) %>ms;
+ S &rarr; B: <%= @model.get('sinatraToBrowserLatency').toFixed(2) %>ms;
+ Total latency: <%= @model.get('clientToBrowserLatency').toFixed(2) %>ms)
