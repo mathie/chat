@@ -1,6 +1,7 @@
 window.Chat =
   Models: {}
   Views: {}
+  Collections: {}
 
 class Chat.Models.Base extends Backbone.Model
   get: (attr) ->
@@ -62,6 +63,49 @@ class Chat.Views.TimestampView extends Backbone.View
     $(@el).html(@template(model: @model))
     @
 
+class Chat.Models.Message extends Chat.Models.Base
+  defaults:
+    createdAt: ->
+      new Date
+    message: "No message body"
+
+class Chat.Collections.MessagesCollection extends Backbone.Collection
+  model: Chat.Models.Message
+
+  initialize: ->
+    $.eventsource
+      label: 'messages'
+      dataType: 'json'
+      url: '/chat/messages'
+      message: @messageReceived
+
+  messageReceived: (data) =>
+    @add
+      createdAt: new Date data.created_at
+      message:   data.message
+
+class Chat.Views.MessagesView extends Backbone.View
+  template: JST['messages/collection']
+
+  initialize: ->
+    @collection.bind 'add', @render
+
+  render: =>
+    @$el.html(@template())
+    @collection.each(@renderMessage)
+    @
+
+  renderMessage: (message) =>
+    messageView = new Chat.Views.MessageView(model: message)
+    $('#messages').prepend(messageView.render().el)
+
+class Chat.Views.MessageView extends Backbone.View
+  template: JST['messages/message']
+
+  render: ->
+    @$el.html(@template(model: @model))
+    @
+
 class Chat.Views.NewMessageView extends Backbone.View
   template: JST['messages/new']
 
@@ -92,3 +136,7 @@ $ ->
 
   newMessageView = new Chat.Views.NewMessageView
   $('#chat').html(newMessageView.render().el)
+
+  messages = new Chat.Collections.MessagesCollection
+  messagesView = new Chat.Views.MessagesView(collection: messages)
+  $('#chat').append(messagesView.render().el)

@@ -1,0 +1,2 @@
+<dt><%= @model.get('createdAt').toTimeString() %></dt>
+<dd><%= @model.get('message') %></dd>
