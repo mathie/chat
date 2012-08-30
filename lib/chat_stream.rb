@@ -1,7 +1,5 @@
 require 'sinatra/base'
 
-$active_streams = 0
-
 class ChatStream < Sinatra::Base
   set connection: -> { AMQP.connect(host: '127.0.0.1') }
 
@@ -12,7 +10,7 @@ class ChatStream < Sinatra::Base
   get '/timestamp', provides: 'text/event-stream' do
     stream(:keep_open) do |out|
       AMQP::Channel.new(settings.connection, auto_recovery: true) do |channel|
-        channel.queue('', durable: false, auto_delete: true).bind('chat.stream').subscribe do |metadata, payload_json|
+        channel.queue('', durable: false, auto_delete: true).bind('chat.timestamps').subscribe do |metadata, payload_json|
           payload = JSON.parse(payload_json)
           milliseconds = Time.now.utc.to_f * 1000.0
           data = {

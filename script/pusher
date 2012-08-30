@@ -6,7 +6,7 @@ require 'json'
 EventMachine.run do
   connection = AMQP.connect(host: 'localhost')
   channel = AMQP::Channel.new(connection)
-  exchange = channel.fanout('chat.stream', durable: true, auto_delete: false)
+  exchange = channel.fanout('chat.timestamps', durable: true, auto_delete: false)
 
   EventMachine.add_periodic_timer(1.0) do
     payload = {
