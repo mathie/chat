@@ -30,4 +30,19 @@ class ChatStream < Sinatra::Base
       end
     end
   end
+
+  get '/messages', provides: 'text/event-stream' do
+    stream(:keep_open) do |out|
+      AMQP::Channel.new(settings.connection, auto_recovery: true) do |channel|
+        channel.queue('', durable: false, auto_delete: true).bind('chat.messages').subscribe do |metadata, payload|
+          out << "event: #{metadata.type}\n"
+          out << "data: #{payload}\n\n"
+        end
+
+        out.callback do
+          channel.close if channel.open?
+        end
+      end
+    end
+  end
 end
