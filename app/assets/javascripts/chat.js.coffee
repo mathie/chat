@@ -62,7 +62,33 @@ class Chat.Views.TimestampView extends Backbone.View
     $(@el).html(@template(model: @model))
     @
 
+class Chat.Views.NewMessageView extends Backbone.View
+  template: JST['messages/new']
+
+  events:
+    'submit #new-message-form': 'sendMessage'
+
+  render: ->
+    @$el.html(@template())
+    @
+
+  sendMessage: (e) ->
+    console.log "Sending message"
+    e.preventDefault()
+    $.ajax
+      url: '/messages'
+      type: 'post'
+      data: $(e.currentTarget).serialize()
+      success: @messageSent
+
+  messageSent: (data, status) ->
+    console.log "Message sent"
+    $('#new-message-form').each (_, form) => form.reset()
+
 $ ->
   timestamp = new Chat.Models.Timestamp
   timestampView = new Chat.Views.TimestampView(model: timestamp)
   $('#timestamp-container').html(timestampView.render().el)
+
+  newMessageView = new Chat.Views.NewMessageView
+  $('#chat').html(newMessageView.render().el)
