@@ -15,14 +15,4 @@ EventMachine.run do
     }
     timestamps_exchange.publish(payload.to_json, type: 'message')
   end
-
-  messages_exchange = channel.fanout('chat.messages', durable: true, auto_delete: false)
-  EventMachine.add_periodic_timer(2.0) do
-    payload = {
-      created_at: Time.now.utc,
-      message: "Random message"
-    }
-
-    messages_exchange.publish(payload.to_json, type: 'message')
-  end
 end
