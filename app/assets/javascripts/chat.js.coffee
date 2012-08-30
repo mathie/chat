@@ -1,3 +1,18 @@
+class Timestamp extends Backbone.Model
+  defaults:
+    serverTime: 'Unknown'
+
+  initialize: ->
+    $.eventsource
+      label: 'current-time'
+      dataType: 'json'
+      url: '/chat/stream'
+      message: @messageReceived
+
+  messageReceived: (data) =>
+    serverTime = new Date data.timestamp
+    @set('serverTime', serverTime)
+
 class TimestampView extends Backbone.View
   tagName:   'p'
   className: 'pull-right navbar-text'
@@ -5,23 +20,13 @@ class TimestampView extends Backbone.View
   template: JST['timestamp']
 
   initialize: ->
-    @serverTime = "Unknown"
+    @model.bind 'change', @render
 
-    console.log "Initialising"
-    $.eventsource
-      label: 'current-time'
-      dataType: 'json'
-      url: '/chat/stream'
-      message: @message
-
-  message: (data) =>
-    @serverTime = new Date data.timestamp
-    @render()
-
-  render: ->
-    $(@el).html(@template(serverTime: @serverTime))
+  render: =>
+    $(@el).html(@template(serverTime: @model.get('serverTime')))
     @
 
 $ ->
-  window.timestampView = new TimestampView
+  timestamp = new Timestamp
+  timestampView = new TimestampView(model: timestamp)
   $('#timestamp-container').html(timestampView.render().el)
