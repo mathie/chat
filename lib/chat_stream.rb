@@ -8,6 +8,7 @@ class ChatStream < Sinatra::Base
   end
 
   get '/timestamp', provides: 'text/event-stream' do
+    headers 'X-Accel-Buffering' => 'No'
     stream(:keep_open) do |out|
       AMQP::Channel.new(settings.connection, auto_recovery: true) do |channel|
         channel.queue('', durable: false, auto_delete: true).bind('chat.timestamps').subscribe do |metadata, payload_json|
@@ -32,6 +33,7 @@ class ChatStream < Sinatra::Base
   end
 
   get '/messages', provides: 'text/event-stream' do
+    headers 'X-Accel-Buffering' => 'No'
     stream(:keep_open) do |out|
       AMQP::Channel.new(settings.connection, auto_recovery: true) do |channel|
         channel.queue('', durable: false, auto_delete: true).bind('chat.messages').subscribe do |metadata, payload|
