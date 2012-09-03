@@ -11,6 +11,7 @@ gem 'thin', git: 'git://github.com/macournoyer/thin'
 gem 'sinatra'
 
 gem 'amqp'
+gem 'newrelic_rpm'
 
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
