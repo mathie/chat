@@ -29,6 +29,10 @@ class Chat.Models.Timestamp extends Chat.Models.Base
     @addTimestamp(serverTime, clientToSinatraLatency, sinatraToBrowserLatency)
 
   addTimestamp: (serverTime, clientToSinatraLatency, sinatraToBrowserLatency) ->
+    # Assume the latency can't be more than 1s and correct for RS Cloud's crap
+    # clock.
+    clientToSinatraLatency = clientToSinatraLatency % 1000
+    sinatraToBrowserLatency = sinatraToBrowserLatency % 1000
     @inc('messageCount')
     @set('serverTime', serverTime)
     @set('clientToSinatraLatency', clientToSinatraLatency)
