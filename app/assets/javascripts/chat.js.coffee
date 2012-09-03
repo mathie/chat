@@ -3,12 +3,6 @@ window.Chat =
   Views: {}
   Collections: {}
 
-
-
-
-
-
-
 $ ->
   timestamp = new Chat.Models.Timestamp
   timestampView = new Chat.Views.TimestampView(model: timestamp)
