@@ -25,7 +25,7 @@ set :use_sudo, false
 
 ssh_options[:forward_agent] = true
 
-after 'deploy:restart', 'thin:restart'
+# after 'deploy:restart', 'thin:restart'
 namespace :thin do
   task :stop, roles: [ :app ], except: { no_release: true } do
     run "kill -TERM $(cat #{shared_path}/pids/thin.pid)"

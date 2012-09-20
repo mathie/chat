@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'em-eventsource'
+require 'json'
+
+$number_of_messages = (ARGV[0] || 100).to_i
+
+EventMachine.run do
+  messages_sent = 0
+  EventMachine.add_periodic_timer(0.1) do
+    if messages_sent < $number_of_messages
+      messages_sent += 1
+      puts "Sending message #{messages_sent}/#{$number_of_messages}."
+      http = EventMachine::HttpRequest.new('http://chat.olemole.co.uk/messages').post body: { message: Time.now.utc.to_f }
+    else
+      puts "Done"
+      EM.stop
+    end
+  end
+end

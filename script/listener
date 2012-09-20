@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+
+require 'em-eventsource'
+require 'json'
+
+$number_of_connections = (ARGV[0] || 10).to_i
+
+$open_connections = {}
+
+def summarise_and_exit
+  missing_messages  = []
+  minimum_latencies = []
+  mean_latencies    = []
+  maximum_latencies = []
+
+  number_of_messages_sent = $open_connections.values.max_by { |v| v[:message_latencies].length }[:message_latencies].length
+
+  puts "Messages sent: #{number_of_messages_sent}"
+
+  $open_connections.each do |source_id, details|
+    number_of_messages_received = details[:message_latencies].length
+    if number_of_messages_sent < number_of_messages_received
+      missing_messages << details
+    end
+
+    minimum_latencies << minimum_latency = details[:message_latencies].min * 1000
+    maximum_latencies << maximum_latency = details[:message_latencies].max * 1000
+    mean_latencies    << mean_latency    = details[:message_latencies].inject(0) { |sum, i| sum + i } / number_of_messages_received.to_f * 1000
+
+    puts "#{source_id}, #{minimum_latency.round(2)}, #{mean_latency.round(2)}, #{maximum_latency.round(2)}"
+  end
+
+  minimum_latency = minimum_latencies.min
+  maximum_latency = maximum_latencies.max
+  mean_latency    = mean_latencies.inject(0) { |sum, i| sum + i } / $open_connections.length
+  puts "Totals #{minimum_latency.round(2)}, #{mean_latency.round(2)}, #{maximum_latency.round(2)}"
+
+  unless missing_messages.empty?
+    puts "These missed some messages: #{missing_messages.inspect}"
+  end
+
+  exit 0
+end
+
+trap('INT') do
+  summarise_and_exit
+end
+
+EventMachine.run do
+  $number_of_connections.times do |source_id|
+    source = EventMachine::EventSource.new('http://chat.olemole.co.uk/chat/messages')
+    source.open do
+      unless $open_connections[source_id] # Reconnection
+        $open_connections[source_id] = {
+          source_id: source_id,
+          source: source,
+          message_latencies: []
+        }
+
+        if $open_connections.length == $number_of_connections
+          puts "All #{$number_of_connections} connections open. Start pushing messages."
+        end
+      end
+    end
+
+    source.error do |error|
+      puts "[#{source_id}] Error: #{error}" unless error =~ /Reconnecting/
+      if error =~ /500$/
+        $number_of_connections -= 1
+      end
+    end
+
+    source.on 'message' do |message|
+      json = JSON.parse(message)
+      latency = Time.now.utc.to_f - Float(json['message'])
+      $open_connections[source_id][:message_latencies] << latency
+    end
+    source.start
+  end
+end

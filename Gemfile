@@ -24,4 +24,6 @@ end
 
 group :development do
   gem 'foreman'
+  gem 'yajl-ruby', require: 'yajl'
+  gem 'em-eventsource', git: 'git://github.com/AF83/em-eventsource'
 end
