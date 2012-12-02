@@ -5,9 +5,18 @@ class ChatStream < Sinatra::Base
     enable :logging
   end
 
-  get '/timestamp', provides: 'text/event-stream' do
+  post '/timestamp', provides: 'text/event-stream' do
     headers 'X-Accel-Buffering' => 'No'
+    headers 'Access-Control-Allow-Origin' => '*'
+    cache_control :no_cache
+
     stream(:keep_open) do |out|
+
+      out << ':'
+      out << ' ' * 2049
+      out << "\n"
+      out << "retry: 500\n"
+
       AMQP::Channel.new(AMQP.connection, auto_recovery: true) do |channel|
         channel.queue('', durable: false, auto_delete: true).bind('chat.timestamps').subscribe do |metadata, payload_json|
           payload = JSON.parse(payload_json)
@@ -30,9 +39,18 @@ class ChatStream < Sinatra::Base
     end
   end
 
-  get '/messages', provides: 'text/event-stream' do
+  post '/messages', provides: 'text/event-stream' do
     headers 'X-Accel-Buffering' => 'No'
+    headers 'Access-Control-Allow-Origin' => '*'
+    cache_control :no_cache
+
     stream(:keep_open) do |out|
+
+      out << ':'
+      out << ' ' * 2049
+      out << "\n"
+      out << "retry: 500\n"
+
       AMQP::Channel.new(AMQP.connection, auto_recovery: true) do |channel|
         channel.queue('', durable: false, auto_delete: true).bind('chat.messages').subscribe do |metadata, payload|
           out << "event: #{metadata.type}\n"
