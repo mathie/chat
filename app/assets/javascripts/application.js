@@ -12,7 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery.eventsource
+//= require eventsource
 //= require twitter/bootstrap
 //= require underscore
 //= require backbone
