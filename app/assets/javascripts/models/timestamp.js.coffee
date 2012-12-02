@@ -16,13 +16,19 @@ class Chat.Models.Timestamp extends Chat.Models.Base
       @get('averageSinatraToBrowserLatency') + @get('averageClientToSinatraLatency')
 
   initialize: ->
-    $.eventsource
-      label: 'timestamp'
-      dataType: 'json'
-      url: '/chat/timestamp'
-      message: @messageReceived
+    eventsource = new EventSource('/chat/timestamp')
+    eventsource.addEventListener 'message', @messageReceived
+    eventsource.addEventListener 'open', (e) ->
+      console.log 'Timestamp connection opened'
+      console.log e
+    eventsource.addEventListener 'error', (e) ->
+      console.log 'Timestamp connection error:'
+      console.log e
 
-  messageReceived: (data) =>
+  messageReceived: (e) =>
+    console.log 'Timestamp message received'
+    console.log e
+    data = JSON.parse(e.data)
     serverTime = new Date data.timestamp
     clientToSinatraLatency = data.latency
     sinatraToBrowserLatency = (new Date).getTime() - data.milliseconds

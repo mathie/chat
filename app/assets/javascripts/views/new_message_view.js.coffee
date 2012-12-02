@@ -17,6 +17,6 @@ class Chat.Views.NewMessageView extends Backbone.View
       data: $(e.currentTarget).serialize()
       success: @messageSent
 
-  messageSent: (data, status) ->
+  messageSent: (data, status) =>
     console.log "Message sent"
     $('#new-message-form').each (_, form) => form.reset()
